@@ -1,8 +1,10 @@
-POST http://localhost:3003/api/blogs
+
+PUT http://localhost:3003/api/blogs/6718fcfcad36c503a5db10bb
 Content-Type: application/json
 
 {
-    "title": "wiki",
-    "author": "pedia",
-    "url": "http://www.wikipedia.org"
+    "title": "Pöhinäkerroin",
+    "author": "Leppätalokomitea",
+    "url": "http://www.wikipedia.org",
+    "likes": "42"
 }

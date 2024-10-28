@@ -176,6 +176,51 @@ describe('deletion', () => {
     })
 })
 
+describe('updating a blog', () => {
+    test('responds with status code 200 on valid input', async () => {
+        const newBlog = {
+            title: "Pöhinä",
+            author: "Leppätalokomitea",
+            url: "http://www.klusteri.network/",
+            likes: "42"
+        }
+        const response = await api.get('/api/blogs')
+        const id = response.body[0].id
+        await api
+            .put(`/api/blogs/${id}`)
+            .send(newBlog)
+            .expect(200)
+    })
+
+    test('responds with status code 400 on missing title', async () => {
+        const newBlog = {
+            author: "Leppätalokomitea",
+            url: "http://www.klusteri.network/",
+            likes: "42"
+        }
+        const response = await api.get('/api/blogs')
+        const id = response.body[0].id
+        await api
+            .put(`/api/blogs/${id}`)
+            .send(newBlog)
+            .expect(400)
+    })
+
+    test('responds with status code 400 on missing url', async () => {
+        const newBlog = {
+            title: "Pöhinä",
+            author: "Leppätalokomitea",
+            likes: "42"
+        }
+        const response = await api.get('/api/blogs')
+        const id = response.body[0].id
+        await api
+            .put(`/api/blogs/${id}`)
+            .send(newBlog)
+            .expect(400)
+    })
+})
+
 after(async () => {
     mongoose.connection.close()
 })

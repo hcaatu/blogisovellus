@@ -24,4 +24,23 @@ blogsRouter.delete('/:id', async (req, res) => {
     res.status(204).end()
 })
 
+blogsRouter.put('/:id', async (req, res) => {
+    if (!req.body.title || !req.body.url) {
+        return res.status(400).json({
+            error: 'missing title or url'
+        })
+    }
+    
+    const newBlog = {
+        title: req.body.title,
+        author: req.body.author,
+        url: req.body.url,
+        likes: req.body.likes
+    }
+    
+    updatedBlog = await Blog.findByIdAndUpdate(req.params.id, newBlog, { new: true })
+    console.log(updatedBlog)
+    res.status(200).json(updatedBlog)
+})
+
 module.exports = blogsRouter
