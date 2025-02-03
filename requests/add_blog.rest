@@ -1,10 +1,10 @@
 
-PUT http://localhost:3003/api/blogs/6718fcfcad36c503a5db10bb
+POST http://localhost:3003/api/blogs
 Content-Type: application/json
 
 {
-    "title": "Pöhinäkerroin",
-    "author": "Leppätalokomitea",
-    "url": "http://www.wikipedia.org",
+    "title": "Pöhinä",
+    "author": "Leppis",
+    "url": "http://www.klusteri.network",
     "likes": "42"
 }
