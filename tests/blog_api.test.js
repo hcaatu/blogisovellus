@@ -1,6 +1,7 @@
 const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 const mongoose = require('mongoose')
 const supertest = require('supertest')
@@ -47,6 +48,12 @@ const initialBlogs = [
       }
 ]
 
+const initialUser = {
+    username: "root",
+    password: "141414",
+    name: "Superuser"
+}
+
 beforeEach(async () => {
     await Blog.deleteMany({})
     
@@ -62,6 +69,10 @@ beforeEach(async () => {
     await blogObject.save()
     blogObject = new Blog(initialBlogs[5])
     await blogObject.save()
+
+    await api
+        .post('/api/users')
+        .send(initialUser)
 })
 
 test('blogs are returned as json', async () => {
@@ -92,45 +103,85 @@ test('identification field of blogs is called "id"', async () => {
     assert.strictEqual(ids.length, initialBlogs.length)
 })
 
-test('a valid blog can be added', async () => {
-    const newBlog = {
-        title: "Pöhinä Kerroin",
-        author: "Leppis Komitea",
-        url: "http://www.klusteri.network/",
-        likes: "42"
+describe('adding blogs:', () => {
+    const loginInfo = {
+        username: "root",
+        password: "141414"
     }
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+    test('a valid blog can be added', async () => {
+        const newBlog = {
+            title: "Pöhinä Kerroin",
+            author: "Leppis Komitea",
+            url: "http://www.klusteri.network/",
+            likes: "42"
+        }
 
-    const response = await api.get('/api/blogs')
+        const res = await api
+            .post('/api/login')
+            .send(loginInfo)
 
-    const titles = response.body.map(blog => blog.title)
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .set('Auhtorization', res.token)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
 
-    assert.strictEqual(response.body.length, initialBlogs.length + 1)
-    assert(titles.includes('Pöhinä Kerroin'))
+        const response = await api.get('/api/blogs')
+
+        const titles = response.body.map(blog => blog.title)
+
+        assert.strictEqual(response.body.length, initialBlogs.length + 1)
+        assert(titles.includes('Pöhinä Kerroin'))
+    })
+
+    test('likes defaults to 0', async () => {
+        const newBlog = {
+            title: "Pöhinä",
+            author: "Leppätalokomitea",
+            url: "http://www.klusteri.network/"
+        }
+
+        await api
+            .post('/api/blogs')
+            .send(newBlog)
+            .expect(201)
+            .expect('Content-Type', /application\/json/)
+
+        const response = await api.get('/api/blogs')
+
+        const addedBlog = response.body.find(blog => blog.title === 'Pöhinä')
+        assert.strictEqual(addedBlog.likes, 0)
+    })
 })
 
-test('likes defaults to 0', async () => {
-    const newBlog = {
-        title: "Pöhinä",
-        author: "Leppätalokomitea",
-        url: "http://www.klusteri.network/"
-    }
+describe('login:', () => {
+    test('is authorized with correct credientals', async () => {
+        const loginInfo = {
+            username: "root",
+            password: "141414"
+        }
 
-    await api
-        .post('/api/blogs')
-        .send(newBlog)
-        .expect(201)
-        .expect('Content-Type', /application\/json/)
+        const response = await api
+            .post('/api/login')
+            .send(loginInfo)
+            .expect(200)
 
-    const response = await api.get('/api/blogs')
+        console.log(`response ${response.body}`)
+    })
 
-    const addedBlog = response.body.find(blog => blog.title === 'Pöhinä')
-    assert.strictEqual(addedBlog.likes, 0)
+    test('is not allowed with wrong password', async () => {
+        const wrongPassword = {
+            username: "root",
+            password: "1234"
+        }
+
+        await api
+            .post('/api/login')
+            .send(wrongPassword)
+            .expect(401)
+    })
 })
 
 describe('POST method with missing:', () => {
