@@ -1,7 +1,6 @@
 const { test, after, beforeEach, describe } = require('node:test')
 const assert = require('node:assert')
 const Blog = require('../models/blog')
-const User = require('../models/user')
 
 const mongoose = require('mongoose')
 const supertest = require('supertest')
@@ -120,11 +119,12 @@ describe('adding blogs:', () => {
         const res = await api
             .post('/api/login')
             .send(loginInfo)
+        console.log(res.body.token)
 
         await api
             .post('/api/blogs')
             .send(newBlog)
-            .set('Auhtorization', res.token)
+            .set('Auhtorization', `Bearer ${res.body.token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
@@ -143,9 +143,16 @@ describe('adding blogs:', () => {
             url: "http://www.klusteri.network/"
         }
 
+        const res = await api
+            .post('/api/login')
+            .send(loginInfo)
+            
+        console.log(res.body.token)
+
         await api
             .post('/api/blogs')
             .send(newBlog)
+            .set('Authorization', `Bearer ${res.body.token}`)
             .expect(201)
             .expect('Content-Type', /application\/json/)
 
@@ -162,13 +169,10 @@ describe('login:', () => {
             username: "root",
             password: "141414"
         }
-
-        const response = await api
+        await api
             .post('/api/login')
             .send(loginInfo)
             .expect(200)
-
-        console.log(`response ${response.body}`)
     })
 
     test('is not allowed with wrong password', async () => {
@@ -176,7 +180,6 @@ describe('login:', () => {
             username: "root",
             password: "1234"
         }
-
         await api
             .post('/api/login')
             .send(wrongPassword)
