@@ -1,7 +1,7 @@
 
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
-Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImthbGxlIiwiaWQiOiI2N2ExY2FjMzMzMjllNzMwYTIyZmQ5NWMiLCJpYXQiOjE3Mzg2NTY0NzB9.xr5YcVQCQzPU5tFMBvmJwRw9K1HAiTLD3fGoCzoX4Kw
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImthbGxlIiwiaWQiOiI2N2ExY2FjMzMzMjllNzMwYTIyZmQ5NWMiLCJpYXQiOjE3Mzg2ODA0MDB9.OfXwCgTuhC45ByLR-YQ3BHyV8RnM5vDWndoELLRY4Yw
 
 {
     "title": "Huippu Blogi",
